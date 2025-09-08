@@ -72,7 +72,7 @@ jobs:
           if [ "$ACTUAL_RELEASE_TYPE" == "prerelease" ]; then
             # 如果选择预发布版本，获取所有 release 并筛选最新的非草稿预发布版本
             latest_tag=$(curl -s https://api.github.com/repos/bia-pain-bache/BPB-Worker-Panel/releases \
-              | jq -r 'map(select(.prerelease == true and .draft == false)) | sort_by(.published_at) | .[-1].tag_name')
+              | jq -r 'map(select(.prerelease == false and .draft == false)) | sort_by(.published_at) | .[-1].tag_name')
             if [ -z "$latest_tag" ]; then
               echo "未找到任何预发布版本。" # 未找到任何预发布版本。
               exit 1
