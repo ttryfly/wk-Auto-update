@@ -80,10 +80,14 @@ jobs:
             echo "最新预发布版本: $latest_tag" # 最新预发布版本
           else
             # 默认或选择正式发布版本，获取最新正式发布版本 (GitHub API 的 /latest 默认返回非预发布版本)
-            latest_tag=$(curl -s https://api.github.com/repos/bia-pain-bache/BPB-Worker-Panel/releases/latest | jq -r '.tag_name')
+            latest_tag=$(curl -s https://api.github.com/repos/bia-pain-bache/BPB-Worker-Panel/releases | jq -r 'map(select(.prerelease == true and .draft == false)) | sort_by(.published_at) | .[-1].tag_name')
             if [ -z "$latest_tag" ]; then
-              echo "未找到任何正式发布版本。" # 未找到任何正式发布版本。
-              exit 1
+            echo "未找到任何预发布版本，尝试获取正式发布版本。"
+          latest_tag=$(curl -s https://api.github.com/repos/bia-pain-bache/BPB-Worker-Panel/releases/latest | jq -r '.tag_name')
+          fi
+          if [ -z "$latest_tag" ]; then
+            echo "未找到任何正式发布或预发布版本，跳过后续步骤或使用默认值。"
+          # exit 1  # 可选：决定是否中断工作流
             fi
             echo "最新正式发布版本: $latest_tag" # 最新正式发布版本
           fi
